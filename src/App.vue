@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, ref } from 'vue'
+import { config } from '../config.ts'
 
 // 定义响应式变量
 const url = ref('')
@@ -21,29 +22,30 @@ onMounted(() => {
 </script>
 
 <template>
+  <title>未知链接 - {{ config.title }}</title>
   <div class="card-info">
-    <img
-      src="https://wsrv.nl/?url=avatars.githubusercontent.com/u/184231508&mask=circle"
-      class="avatar"
-    />
+    <img :src="config.favicon" class="avatar" />
     <h1 style="margin-bottom: 0">警告</h1>
     <p>访问未知链接</p>
     <div class="link"></div>
-    <p class="tips">此链接未通过验证，如果您不知道此链接，请谨慎访问。
-    <a class="official" href="https://qwq.blue">点击此处以回到 Silvaire's Blog。</a></p>
-    <a :href="url" class="btn">跳转</a>
+    <p class="tips">
+      此链接未通过验证，如果您不知道此链接，请三思后再访问。
+      <a class="official" :href="config.defaultLink">点击此处前往 {{ config.linkText }}。</a>
+    </p>
+    <div class="btns">
+      <a href="#" onclick="javascript:history.back(-1);" class="back">返回</a>
+      <a :href="url" class="continue">继续</a>
+    </div>
   </div>
 </template>
-
 
 <style>
 @font-face {
   font-family: 'HYTMR';
-  src: url("https://npm.elemecdn.com/fontcdn-ariasaka@1.0.0/HYTangMeiRen55W.woff2");
+  src: url('https://npm.elemecdn.com/fontcdn-ariasaka@1.0.0/HYTangMeiRen55W.woff2');
 }
 
 :root {
-  --dark-primary: #5968c2;
   --primary: #7287fd;
   --bg: #eff1f5;
   --alt: #e6e9ef;
@@ -59,7 +61,6 @@ onMounted(() => {
   --text: #4c4f69;
 }
 :root.dark {
-  --dark-primary: #939bcd;
   --primary: #b4befe;
   --bg: #1e1e2e;
   --alt: #181825;
@@ -79,6 +80,7 @@ body {
   * {
     color: var(--text);
     font-family: 'HYTMR', sans-serif;
+    transition: all 0.3s;
   }
 }
 .card-info {
@@ -109,6 +111,7 @@ body {
 }
 
 div.link {
+  color: var(--overlay-2);
   border: 1px solid var(--surface-1);
   padding: 18px 24px;
   border-radius: 1rem;
@@ -120,23 +123,44 @@ p.tips {
   margin-top: 30px;
 }
 
-a.btn {
+div.btns {
+  margin-top: auto;
+  display: flex;
+  gap: 8px;
+}
+
+a.continue {
+  flex-grow: 1;
   font-weight: bold;
   background-color: var(--primary);
   color: var(--alt);
   text-decoration: none;
   padding: 10px 20px;
   text-align: center;
-  border-radius: 9999em; 
-  transition: all .2s;
-  margin-top: auto; 
+  border-radius: 9999em;
   &:hover {
-    background-color: var(--dark-primary);
+    opacity: .7;
+  }
+}
+
+a.back {
+  flex-grow: 1;
+  font-weight: bold;
+  background-color: var(--surface-0);
+  text-decoration: none;
+  padding: 10px 20px;
+  text-align: center;
+  border-radius: 9999em;
+  &:hover {
+    opacity: .7;
   }
 }
 
 a.official {
   text-decoration: none;
   color: var(--primary);
+  &:hover {
+    opacity: .7;
+  }
 }
 </style>

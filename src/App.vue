@@ -4,37 +4,57 @@ import { config } from '../config.ts'
 
 // 定义响应式变量
 const url = ref('')
+const oldUrl = ref('')
 
 onMounted(() => {
   const theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
   document.documentElement.classList.remove('dark', 'light')
   document.documentElement.classList.add(theme)
 
-  // 从 URL 参数获取链接
+  if (theme === 'light') {
+    document.documentElement.style.setProperty('--primary', config.lightColor)
+  } else {
+    document.documentElement.style.setProperty('--primary', config.darkColor)
+  }
+
   const urlParams = new URLSearchParams(window.location.search)
   const paramUrl = urlParams.get('url')
+
   if (paramUrl) {
-    url.value = paramUrl
+    oldUrl.value = paramUrl
+  } else {
+    oldUrl.value = ''
+  }
+  
+  if (paramUrl) {
+    try {
+      const parsed = new URL(paramUrl)
+      url.value = `https://${config.defaultLink}${parsed.pathname}${parsed.search}${parsed.hash}`
+    } catch {
+      url.value = paramUrl
+    }
     const el = document.querySelector('div.link')
     if (el) el.textContent = paramUrl
   }
 })
+
+
 </script>
 
 <template>
-  <title>未知链接 - {{ config.title }}</title>
+  <title>域名错误 - {{ config.title }}</title>
   <div class="card-info">
     <img :src="config.favicon" class="avatar" />
     <h1 style="margin-bottom: 0">警告</h1>
-    <p>访问未知链接</p>
+    <p>错误的域名</p>
     <div class="link"></div>
     <p class="tips">
-      此链接未通过验证，如果您不知道此链接，请三思后再访问。
-      <a class="official" :href="config.defaultLink">点击此处前往 {{ config.linkText }}。</a>
+      此链接未通过验证，可能存在安全问题，您可以跳转至正确的域名。
+      <a class="official" :href="oldUrl">仍要访问。</a>
     </p>
     <div class="btns">
       <a href="#" onclick="javascript:history.back(-1);" class="back">返回</a>
-      <a :href="url" class="continue">继续</a>
+      <a :href="url" class="continue">跳转</a>
     </div>
   </div>
 </template>
@@ -46,7 +66,6 @@ onMounted(() => {
 }
 
 :root {
-  --primary: #7287fd;
   --bg: #eff1f5;
   --alt: #e6e9ef;
   --elv: #dce0e8;
@@ -61,7 +80,6 @@ onMounted(() => {
   --text: #4c4f69;
 }
 :root.dark {
-  --primary: #b4befe;
   --bg: #1e1e2e;
   --alt: #181825;
   --elv: #11111b;
@@ -116,6 +134,9 @@ div.link {
   padding: 18px 24px;
   border-radius: 1rem;
   margin-top: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 p.tips {
